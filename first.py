@@ -49,7 +49,7 @@ st.divider()
 st.subheader("💬 AI CFO 動態情境推演 (What-If 預測)")
 
 # --- ⚠️ 記得把你的 API Key 貼回這裡 (保留雙引號！) ---
-MY_API_KEY = "AIzaSyBUNsG8yUbBUdhJvzoQlwzEPLcgULcJRhw"
+MY_API_KEY = "你的真實_API_KEY_字串"
 
 if MY_API_KEY == "在這裡貼上你的_API_KEY" or not MY_API_KEY:
     st.warning("👈 老闆，請先到程式碼裡面貼上您的 Gemini API Key，AI 大腦才能啟動！")
