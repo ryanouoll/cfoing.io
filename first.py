@@ -89,7 +89,7 @@ st.subheader("💬 AI CFO 動態情境推演 & 報告生成")
 try:
     MY_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
-    MY_API_KEY = "AIzaSyBn0BG7GMtNgcN3_EPEJIUiwG2ySVObWfU"
+    MY_API_KEY = ""
 
 if not MY_API_KEY:
     st.error("👈 老闆，系統找不到 API Key！請確認已經在 Streamlit 後台的 Secrets 貼上 `GEMINI_API_KEY = \"你的英數密碼\"`。")
