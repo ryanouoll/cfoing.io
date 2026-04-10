@@ -54,7 +54,7 @@ try:
     # 這裡會自動去 Streamlit Cloud 的 Secrets 裡面找 GEMINI_API_KEY
     MY_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
-    MY_API_KEY = "AIzaSyAW-6fVW42ANPwRI4AauvI3tmsR_-zRbSg"
+    MY_API_KEY = " "
     
 
 if not MY_API_KEY:
