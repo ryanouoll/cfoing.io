@@ -89,7 +89,7 @@ st.subheader("💬 AI CFO 動態情境推演 & 報告生成")
 try:
     MY_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
-    MY_API_KEY = " "
+    MY_API_KEY = "AIzaSyBn0BG7GMtNgcN3_EPEJIUiwG2ySVObWfU"
 
 if not MY_API_KEY:
     st.error("👈 老闆，系統找不到 API Key！請確認已經在 Streamlit 後台的 Secrets 貼上 `GEMINI_API_KEY = \"你的英數密碼\"`。")
@@ -131,7 +131,7 @@ else:
             with st.spinner("AI CFO 正在推演未來風險..."):
                 try:
                     response = client.models.generate_content(
-                        model='gemini-2.0-flash', 
+                        model='gemini-2.5-flash', 
                         contents=system_prompt,
                     )
                     st.markdown(response.text)
@@ -170,7 +170,7 @@ else:
             
             try:
                 response_vc = client.models.generate_content(
-                    model='gemini-2.0-flash', 
+                    model='gemini-2.5-flash', 
                     contents=vc_prompt,
                 )
                 st.success("✅ 報告生成成功！請過目並直接複製寄出：")
@@ -214,7 +214,7 @@ else:
             
             try:
                 response_tax = client.models.generate_content(
-                    model='gemini-2.0-flash',
+                    model='gemini-2.5-flash',
                     contents=tax_prompt,
                 )
                 
