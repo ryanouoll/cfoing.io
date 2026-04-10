@@ -3,10 +3,11 @@ import pandas as pd
 import plotly.express as px
 from google import genai
 from google.genai import errors
+#python -m streamlit run first.py
 
 # --- 頁面設定 ---
 st.set_page_config(page_title="AI CFO Dashboard", layout="wide")
-st.title("📊 supereme AI CFO - statup time")
+st.title("📊 supreme AI CFO - startup time")
 
 @st.cache_data 
 def load_data():
@@ -43,19 +44,23 @@ st.divider()
 
 st.subheader("📈 歷史收支圖")
 fig = px.line(df, x='date', y='amount', color='type', title="營收 vs 支出趨勢")
-st.plotly_chart(fig, width='stretch') # 這裡修復了圖表的過期警告
+st.plotly_chart(fig, width='stretch')
 
 st.divider()
 st.subheader("💬 AI CFO 動態情境推演 (What-If 預測)")
 
-# --- ⚠️ 記得把你的 API Key 貼回這裡 (保留雙引號！) ---
-# 從 Streamlit Secrets 安全讀取 API Key
-MY_API_KEY = st.secrets["GEMINI_API_KEY"]
+# --- 安全讀取 API Key ---
+try:
+    # 這裡會自動去 Streamlit Cloud 的 Secrets 裡面找 GEMINI_API_KEY
+    MY_API_KEY = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    MY_API_KEY = "AIzaSyAW-6fVW42ANPwRI4AauvI3tmsR_-zRbSg"
+    
 
-if MY_API_KEY == "在這裡貼上你的_API_KEY" or not MY_API_KEY:
-    st.warning("👈 老闆，請先到程式碼裡面貼上您的 Gemini API Key，AI 大腦才能啟動！")
+if not MY_API_KEY:
+    st.error("👈 老闆，系統找不到 API Key！請確認已經在 Streamlit 後台的 Secrets 貼上 `GEMINI_API_KEY = \"你的英數密碼\"`。")
 else:
-    # 這是新版 SDK 的連線方式
+    # --- 新版 SDK 的連線方式 ---
     client = genai.Client(api_key=MY_API_KEY)
 
     financial_summary = f"""
@@ -73,6 +78,7 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+    # 聊天輸入框
     if prompt := st.chat_input("老闆，您想模擬什麼情境？(例如：如果下個月多請一個月薪一萬的工程師...)"):
         
         with st.chat_message("user"):
@@ -90,18 +96,14 @@ else:
         with st.chat_message("assistant"):
             with st.spinner("AI CFO 正在推演未來風險... (若轉圈較久請耐心等待幾秒鐘)"):
                 try:
-                    # 剛剛的報錯證明 gemini-2.0-flash 是認得的，直接用它！
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=system_prompt,
                     )
                     st.markdown(response.text)
-                    
-                    # 只有成功拿到回覆，才寫入對話紀錄 (修正先前的 NameError)
                     st.session_state.messages.append({"role": "assistant", "content": response.text})
                     
                 except errors.APIError as e:
-                    # 完美的防彈護盾：把 API 錯誤轉化為人類看得懂的警告，且不讓程式崩潰
                     if e.code == 429:
                         st.error("⏳ 老闆，您按太快啦！免費版 API 有頻率限制，請喝口水，等候 1 分鐘後再發問一次。")
                     elif e.code == 503:
@@ -110,3 +112,36 @@ else:
                         st.error(f"❌ 發生 API 錯誤：{e.code} - {e.message}")
                 except Exception as e:
                     st.error(f"❌ 發生未知的系統錯誤：{e}")
+
+    # ==========================================
+    # 🚀 新功能：一鍵生成投資人報告 (VC Updates)
+    # ==========================================
+    st.divider()
+    st.subheader("📝 一鍵生成 CEO 每月致股東信")
+    st.markdown("月底到了，不想寫報告？讓 AI 幫你把數據轉化為專業的 VC Update。")
+
+    if st.button("✨ 幫我寫這封信給 VC", use_container_width=True):
+        
+        with st.spinner("AI 正在為您撰寫專業的投資人報告..."):
+            vc_prompt = f"""
+            你是一位專業的矽谷新創 CEO。請根據以下公司本月的財務數據，寫一封給風險投資人 (VC) 的「每月致股東信 (Monthly Investor Update)」。
+            語氣要充滿自信、簡潔明瞭，並展現出你對公司狀況的完全掌控。
+            
+            必須包含以下三個段落：
+            1. 執行摘要 (Executive Summary)
+            2. 財務亮點與隱憂 (Financial Highlights & Risks)
+            3. 下個月的行動計畫 (Next Steps)
+
+            本月真實數據：
+            {financial_summary}
+            """
+            
+            try:
+                response_vc = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=vc_prompt,
+                )
+                st.success("✅ 報告生成成功！請過目並直接複製寄出：")
+                st.info(response_vc.text)
+            except Exception as e:
+                st.error(f"❌ 報告生成失敗：{e}")
