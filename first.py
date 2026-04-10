@@ -6,7 +6,7 @@ from google.genai import errors
 
 # --- 頁面設定 ---
 st.set_page_config(page_title="AI CFO Dashboard", layout="wide")
-st.title("📊 超級 AI CFO - 新創續命儀表板")
+st.title("📊 supereme AI CFO - statup time")
 
 @st.cache_data 
 def load_data():
@@ -49,7 +49,8 @@ st.divider()
 st.subheader("💬 AI CFO 動態情境推演 (What-If 預測)")
 
 # --- ⚠️ 記得把你的 API Key 貼回這裡 (保留雙引號！) ---
-MY_API_KEY = "你的真實_API_KEY_字串"
+# 從 Streamlit Secrets 安全讀取 API Key
+MY_API_KEY = st.secrets["GEMINI_API_KEY"]
 
 if MY_API_KEY == "在這裡貼上你的_API_KEY" or not MY_API_KEY:
     st.warning("👈 老闆，請先到程式碼裡面貼上您的 Gemini API Key，AI 大腦才能啟動！")
